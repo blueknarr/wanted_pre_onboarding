@@ -200,3 +200,24 @@ def apply():
         except SQLAlchemyError as e:
             db.session.rollback()
             return jsonify({'result': 'failed', 'msg': e})
+
+
+@bp.route('/delete', methods=['GET'])
+def delete():
+    """
+    채용 공고 삭제 api
+    :return: dict
+    """
+    id = request.args.get('id')
+    job_posting = JobPosting.query.get(id)
+
+    if job_posting:
+        try:
+            db.session.delete(job_posting)
+            db.session.commit()
+            return jsonify({'result': 'success', 'msg': f'{id}번 채용 공고를 삭제했습니다.'})
+        except SQLAlchemyError as e:
+            db.session.rollback()
+            return jsonify({'result': 'failed', 'msg': e})
+    else:
+        return jsonify({'result': 'failed', 'msg': f'{id}번 채용 공고가 없습니다.'})
