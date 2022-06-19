@@ -1,0 +1,15 @@
+[tool.poetry]
+name = "wanted_pre_onboarding"
+version = "0.1.0"
+description = "프리온보딩 백엔드 코스 3차 선발과제"
+authors = ["Yong Su Jeong <knarrblue@gmail.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.8"
+Flask = "^2.1.2"
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
