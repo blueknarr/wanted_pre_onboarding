@@ -50,3 +50,5 @@ $ flask run
 - job_posting: 채용 공고(id, 채용 기업, 직무, 보너스, 직무 설명서, 기술 스택)
 - application_history: 채용 공고 지원 내역(id, 채용공고 id, 유저 id)
 - users: 사용자(id)
+
+![erd](https://user-images.githubusercontent.com/44389424/174472522-ec40a494-f91e-4df2-9905-18224f1b4e29.png)
