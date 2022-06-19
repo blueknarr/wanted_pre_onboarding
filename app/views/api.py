@@ -1,7 +1,7 @@
 from flask import Blueprint, jsonify, request
 from app.models import JobPosting, Company, db
 from sqlalchemy.exc import SQLAlchemyError
-
+from sqlalchemy import or_
 
 bp = Blueprint(
     'api',
@@ -97,3 +97,44 @@ def get_list():
         })
 
     return jsonify(ret)
+
+
+@bp.route('/search', methods=['GET'])
+def search():
+    """
+    키워드로 채용 공고를 검색하는 api
+    category: 기업명, 기술 스택
+    keyword: 검색어
+    :return: dict
+    """
+    select = request.args.get('select')
+    keyword = request.args.get('keyword')
+
+    # 검색 수정
+    if select == 'company_id':
+        search_keywords = JobPosting.query.filter(
+            JobPosting.company_id.ilike(f'%{keyword}%')
+        ).all()
+    elif select == 'tech_stack':
+        search_keywords = JobPosting.query.filter(
+            or_(
+                JobPosting.tech_stack.ilike(f'%{keyword}%'),
+                JobPosting.job_position.ilike(f'%{keyword}%')
+            )
+        ).all()
+
+    if search_keywords:
+        job_posting = []
+        for search_keyword in search_keywords:
+            job_posting.append({
+                '채용공고': search_keyword.id,
+                '회사명': search_keyword.company_id,
+                '채용포지션': search_keyword.job_position,
+                '국가': search_keyword.company.country,
+                '지역': search_keyword.company.region,
+                '채용보상금': search_keyword.bonus,
+                '사용기술': search_keyword.tech_stack,
+            })
+        return jsonify(job_posting)
+    else:
+        return jsonify({'result': 'failed', 'msg': f'{keyword}에 해당하는 채용 공고가 없습니다.'})
