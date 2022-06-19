@@ -16,8 +16,9 @@ def create_app():
     db.init_app(app)
     migrate.init_app(app, db)
 
-    @app.route('/')
-    def main():
-        return 'hello flask!!'
+    # Blueprint
+    from app.views import main, api
+    app.register_blueprint(main.bp)
+    app.register_blueprint(api.bp)
 
     return app
