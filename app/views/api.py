@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, request
-from app.models import JobPosting, db
+from app.models import JobPosting, Company, db
 from sqlalchemy.exc import SQLAlchemyError
 
 
@@ -72,3 +72,28 @@ def update():
             return jsonify({'result': 'failed', 'msg': e})
     else:
         return {'result': 'failed', 'msg': f'{id}번 채용 공고가 없습니다.'}
+
+
+@bp.route('/list', methods=['GET'])
+def get_list():
+    """
+    채용 공고 목록을 보여주는 api
+    :return: dict
+    """
+    job_postings = JobPosting.query.all()
+    ret = []
+
+    for job_posting in job_postings:
+        company = Company.query.get(job_posting.company_id)
+
+        ret.append({
+            '채용공고': job_posting.id,
+            '회사명': job_posting.company_id,
+            '채용포지션': job_posting.job_position,
+            '국가': company.country,
+            '지역': company.region,
+            '채용보상금': job_posting.bonus,
+            '사용기술': job_posting.tech_stack
+        })
+
+    return jsonify(ret)
