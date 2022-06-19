@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, request
-from app.models import JobPosting, Company, db
+from app.models import JobPosting, Company, ApplicationHistory, db
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy import or_
 from sqlalchemy.orm import joinedload
@@ -173,3 +173,30 @@ def details():
         return ret
     else:
         return {'result': 'failed', 'msg': f'등록된 {id}번 채용 공고가 없습니다.'}
+
+
+@bp.route('/apply', methods=['POST'])
+def apply():
+    """
+    유저가 채용 공고에 지원하는 api
+    :return: dict
+    """
+    job_posting_id = request.form['job_posting_id']
+    user_id = request.form['user_id']
+
+    applicant = ApplicationHistory.query.filter_by(job_posting_id=job_posting_id, user_id=user_id)
+
+    if applicant:
+        return jsonify({'result': 'failed', 'msg': '지원을 완료한 채용 공고입니다.'})
+    else:
+        try:
+            applicant = ApplicationHistory(
+                job_posting_id=job_posting_id,
+                user_id=user_id
+            )
+            db.session.add(applicant)
+            db.session.commit()
+            return jsonify({'result': 'success'})
+        except SQLAlchemyError as e:
+            db.session.rollback()
+            return jsonify({'result': 'failed', 'msg': e})
